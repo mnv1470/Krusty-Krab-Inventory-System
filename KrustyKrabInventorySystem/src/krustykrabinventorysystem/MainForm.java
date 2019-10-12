@@ -1,5 +1,11 @@
 package krustykrabinventorysystem;
 
+
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import java.awt.*;
 import javax.swing.*;
 import java.io.*;
@@ -9,7 +15,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import java.awt.Color;
 import java.awt.Component;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
@@ -77,6 +86,7 @@ public class MainForm extends javax.swing.JFrame    {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         txtSearch = new javax.swing.JTextField();
+        btnGeneratePdf = new javax.swing.JButton();
         btnMinimize = new javax.swing.JButton();
         pnlBG = new javax.swing.JPanel();
 
@@ -447,6 +457,13 @@ public class MainForm extends javax.swing.JFrame    {
             }
         });
 
+        btnGeneratePdf.setText("Generate Report");
+        btnGeneratePdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGeneratePdfActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlInventoryListFormLayout = new javax.swing.GroupLayout(pnlInventoryListForm);
         pnlInventoryListForm.setLayout(pnlInventoryListFormLayout);
         pnlInventoryListFormLayout.setHorizontalGroup(
@@ -460,13 +477,15 @@ public class MainForm extends javax.swing.JFrame    {
                         .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlInventoryListFormLayout.createSequentialGroup()
                         .addGap(0, 11, Short.MAX_VALUE)
-                        .addGroup(pnlInventoryListFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnlInventoryListFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(pnlInventoryListFormLayout.createSequentialGroup()
                                 .addComponent(btnAddItem)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnEdit)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnDelete))
+                                .addComponent(btnDelete)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnGeneratePdf))
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(23, 23, 23))
         );
@@ -483,7 +502,8 @@ public class MainForm extends javax.swing.JFrame    {
                 .addGroup(pnlInventoryListFormLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddItem)
                     .addComponent(btnEdit)
-                    .addComponent(btnDelete))
+                    .addComponent(btnDelete)
+                    .addComponent(btnGeneratePdf))
                 .addGap(15, 15, 15))
         );
 
@@ -1053,6 +1073,60 @@ catch(NullPointerException e)
         }
     }//GEN-LAST:event_tblInventoryMousePressed
 
+    private void btnGeneratePdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePdfActionPerformed
+        String dt = LocalDate.now().toString();
+        String path = "";
+        JFileChooser jf = new JFileChooser();
+        jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int x = jf.showSaveDialog(this);
+        
+       
+        if(x == JFileChooser.APPROVE_OPTION)
+        {
+            path = jf.getSelectedFile().getPath();
+        }
+        
+        Document doc = new Document();
+        try {
+            PdfWriter.getInstance(doc, new FileOutputStream(path + "/"+ dt +" INVENTORY REPORT.pdf"));
+            doc.open();
+            PdfPTable pdfTbl = new PdfPTable(5);
+            //com.lowagie.text.Rectangle pgSz = PageSize.A4.rotate();
+            doc.setPageSize(PageSize.A4.rotate());
+            
+            
+            pdfTbl.addCell("Code");
+            pdfTbl.addCell("Name");
+            pdfTbl.addCell("Description");
+            pdfTbl.addCell("Amount");
+            pdfTbl.addCell("Quantity");
+            
+            
+            for(int i = 0; i < tblInventory.getRowCount(); i++)
+            {
+                String codee = tblInventory.getValueAt(i,1).toString(); 
+                String namee = tblInventory.getValueAt(i,2).toString(); 
+                String descrii = tblInventory.getValueAt(i,3).toString(); 
+                String amountt = tblInventory.getValueAt(i,4).toString(); 
+                String quantity = tblInventory.getValueAt(i,5).toString(); 
+                
+                pdfTbl.addCell(codee);
+                pdfTbl.addCell(namee);
+                pdfTbl.addCell(descrii);
+                pdfTbl.addCell(amountt);
+                pdfTbl.addCell(quantity);
+            }
+            
+            doc.add(pdfTbl);
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DocumentException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        doc.close();
+    }//GEN-LAST:event_btnGeneratePdfActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1096,6 +1170,7 @@ catch(NullPointerException e)
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnGeneratePdf;
     private javax.swing.JButton btnHome;
     private javax.swing.JButton btnInventory;
     private javax.swing.JButton btnMinimize;
