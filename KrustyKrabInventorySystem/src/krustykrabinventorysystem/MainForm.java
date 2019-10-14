@@ -4,8 +4,10 @@ package krustykrabinventorysystem;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Text;
 import java.awt.*;
 import javax.swing.*;
 import java.io.*;
@@ -15,14 +17,26 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableRowSorter;
 import java.awt.Color;
 import java.awt.Component;
+import static java.lang.Thread.sleep;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainForm extends javax.swing.JFrame    {
 
@@ -31,9 +45,16 @@ public class MainForm extends javax.swing.JFrame    {
      */
     public MainForm() {
         initComponents();
+        close();
+        pnlHome.setVisible(true);
         addTableHeader();
         setLocationRelativeTo(null);
         setPreEnteredData();
+        clock();
+        date();
+        getFilesName();
+       
+        
         
         //drop shadow
         
@@ -58,7 +79,11 @@ public class MainForm extends javax.swing.JFrame    {
         lblMenuLogo = new javax.swing.JLabel();
         pnlMainCardLayout = new javax.swing.JPanel();
         pnlReports = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblReports = new javax.swing.JTable();
         pnlHome = new javax.swing.JPanel();
+        lblDateTime = new javax.swing.JLabel();
+        lblTimeLang = new javax.swing.JLabel();
         pnlInventoryEntryForm = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -195,30 +220,67 @@ public class MainForm extends javax.swing.JFrame    {
 
         pnlReports.setBackground(new java.awt.Color(255, 255, 255));
 
+        tblReports.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        tblReports.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblReports.setGridColor(new java.awt.Color(255, 255, 255));
+        tblReports.setIntercellSpacing(new java.awt.Dimension(0, 0));
+        tblReports.setOpaque(false);
+        jScrollPane3.setViewportView(tblReports);
+
         javax.swing.GroupLayout pnlReportsLayout = new javax.swing.GroupLayout(pnlReports);
         pnlReports.setLayout(pnlReportsLayout);
         pnlReportsLayout.setHorizontalGroup(
             pnlReportsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 471, Short.MAX_VALUE)
+            .addGroup(pnlReportsLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         pnlReportsLayout.setVerticalGroup(
             pnlReportsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 399, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlReportsLayout.createSequentialGroup()
+                .addContainerGap(57, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(48, 48, 48))
         );
 
         pnlMainCardLayout.add(pnlReports, "card2");
 
         pnlHome.setBackground(new java.awt.Color(255, 255, 255));
 
+        lblDateTime.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        lblDateTime.setForeground(new java.awt.Color(0, 0, 0));
+        lblDateTime.setText("date and time");
+
+        lblTimeLang.setForeground(new java.awt.Color(0, 0, 0));
+        lblTimeLang.setText("date and time");
+
         javax.swing.GroupLayout pnlHomeLayout = new javax.swing.GroupLayout(pnlHome);
         pnlHome.setLayout(pnlHomeLayout);
         pnlHomeLayout.setHorizontalGroup(
             pnlHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 471, Short.MAX_VALUE)
+            .addGroup(pnlHomeLayout.createSequentialGroup()
+                .addGap(53, 53, 53)
+                .addGroup(pnlHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTimeLang, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDateTime, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlHomeLayout.setVerticalGroup(
             pnlHomeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 399, Short.MAX_VALUE)
+            .addGroup(pnlHomeLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(lblDateTime)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTimeLang)
+                .addContainerGap(332, Short.MAX_VALUE))
         );
 
         pnlMainCardLayout.add(pnlHome, "card2");
@@ -587,6 +649,43 @@ public class MainForm extends javax.swing.JFrame    {
         
     }
     
+    
+      public void getFilesName()
+    {
+        
+        modeel =    (DefaultTableModel)tblReports.getModel();
+        modeel.setColumnIdentifiers(new Object[]{"Reports","Date Created"});
+        File file = null;
+       
+        file = new File(getClass().getResource("/PDFs").getFile());
+        tblReports.setShowGrid(false);
+        String nameee, dateee;
+        File[] files = file.listFiles();
+        
+      
+        for(int i = 0; i < files.length; i++)
+        {
+            BasicFileAttributes attr = null;
+            Path filee = file.toPath();
+            try {
+                  attr = Files.readAttributes(filee, BasicFileAttributes.class);
+            } catch (IOException ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            Calendar c = Calendar.getInstance();
+            FileTime dateeee = attr.creationTime();
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm a");
+            String dt = sdf.format(c.getTime()); 
+            nameee = files[i].getName();
+            //dateee = String.valueOf(df.format(dateeee.toMillis()));
+            modeel.addRow(new Object[]{nameee, dt});
+        }
+        
+        
+        
+        
+    }
+    
     void setPreEnteredData()
     {
         JLabel imageLabel = newImage("C:\\Users\\Victorio\\Documents\\NetBeansProjects\\KrustyKrabInventorySystem\\src\\images\\bread.jpg");
@@ -712,10 +811,9 @@ public class MainForm extends javax.swing.JFrame    {
     public String qty = "";
     boolean isInEditMode = false;
     String selectedImagePath = "";
-    
+    DefaultTableModel modeel;
     int locatedRow;
     int locatedCol;
-    
     int mousePX;
     int mousePY;
     
@@ -746,6 +844,21 @@ tblInventory.addMouseListener(new java.awt.event.MouseAdapter() {
             
     }
 });
+    }
+
+    public class TimerTaskExample extends TimerTask {
+        private String name;
+        public TimerTaskExample(String n) {
+            this.name = n;
+        }
+        @Override
+        public void run()
+        {
+            modeel.setRowCount(0);
+            generatePDF();
+            
+            getFilesName();
+        }
     }
    class CellRenderer implements TableCellRenderer {
  
@@ -823,8 +936,7 @@ tblInventory.addMouseListener(new java.awt.event.MouseAdapter() {
         qty = txtQuantity.getText();
  
         JLabel imageLabel = newImage(selectedImagePath);
-//        imageLabel.setIcon(imageicon);
- 
+
 try
 {
         //Checking if one or more field is empty
@@ -869,7 +981,7 @@ try
                     isInEditMode = false;
                     close();
                     pnlInventoryListForm.setVisible(true);
-                    
+                    popUpWarningLowOnStock();
                 }
             }
         } else {
@@ -951,7 +1063,7 @@ catch(NullPointerException e)
         if ( !(Character.isLetter(c)) && !(c == evt.VK_BACK_SPACE) && !(c == evt.VK_DELETE) && !(c == evt.VK_SPACE) ){
         evt.consume();
         }
-        if(txtCode.getText().length()  >=  6) {  
+        if(txtName.getText().length()  >=  25) {  
         evt.consume();
         }
     }//GEN-LAST:event_txtNameKeyTyped
@@ -961,7 +1073,7 @@ catch(NullPointerException e)
         if ( !(Character.isDigit(c)) && !(c == evt.VK_BACK_SPACE) && !(c == evt.VK_DELETE) && !(c == evt.VK_PERIOD) ){
         evt.consume();
         }
-        if(txtCode.getText().length()  >=  6) {  
+        if(txtAmount.getText().length()  >=  6) {  
         evt.consume();
         }
     }//GEN-LAST:event_txtAmountKeyTyped
@@ -978,7 +1090,7 @@ catch(NullPointerException e)
         if ( !(Character.isDigit(c)) && !(c == evt.VK_BACK_SPACE) && !(c == evt.VK_DELETE) ){
         evt.consume();
         }
-        if(txtCode.getText().length()  >=  6) {  
+        if(txtQuantity.getText().length()  >=  6) {  
         evt.consume();
         }
     }//GEN-LAST:event_txtQuantityKeyTyped
@@ -1073,9 +1185,119 @@ catch(NullPointerException e)
         }
     }//GEN-LAST:event_tblInventoryMousePressed
 
-    private void btnGeneratePdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePdfActionPerformed
+    String getMonthForInt(int num) {
+        String month = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        if (num >= 0 && num <= 11 ) {
+            month = months[num];
+        }
+        return month;
+    }
+    
+    String getAMPMForInt(int num) {
+        String ampm = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] amorpm = dfs.getAmPmStrings();
+        if (num >= 0 && num <= 1 ) {
+            ampm = amorpm[num];
+        }
+        return ampm;
+    }
+    
+    String getDaysForInt(int num) {
+        String days = "wrong";
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] day = dfs.getWeekdays();
+        if (num >= 0 && num <= 6 ) {
+            days = day[num];
+        }
+        return days;
+    }
+    
+    
+    private void date()
+    {
+        Thread clock = new Thread()
+        {
+            public void run()
+            {
+                try
+                {
+                    for(;;)
+                    {
+                        Calendar cal = new GregorianCalendar();
+                        String day = String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
+                        String dayOfWeek = getDaysForInt(cal.get(Calendar.DAY_OF_WEEK));
+                        String month = String.valueOf(cal.get(Calendar.MONTH));
+                        String year = String.format("%02d", (Object)(cal.get(Calendar.YEAR)));
+                        String monthOfYear = getMonthForInt(cal.get(Calendar.MONTH));
+                        
+                        lblDateTime.setText(dayOfWeek + ", " + monthOfYear + " " + day + ", " + year);
+                        
+                       
+                        
+                        sleep(1000);
+                        
+                    }
+                }
+                catch(InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        clock.start();
+    }
+    
+    private void clock()
+    {
+        Thread clock = new Thread()
+        {
+            public void run()
+            {
+                TimerTaskExample tel = new TimerTaskExample("Task 1");
+        Timer t = new Timer();
+        t.scheduleAtFixedRate(tel, 0, 10*1000);
+        
+                try
+                {
+                    for(;;)
+                    {
+                        Calendar cal = new GregorianCalendar();
+                        
+                        String second = String.format("%02d", (Object)(cal.get(Calendar.SECOND)));
+                        String min = String.format("%02d", (Object)(cal.get(Calendar.MINUTE)));
+                        String hour = String.valueOf(cal.get(Calendar.HOUR));
+                        String amOrPm = getAMPMForInt(cal.get(Calendar.AM_PM));
+                        
+                        lblTimeLang.setText(hour + ":" + min + ":" + second + " " + amOrPm); 
+                        
+                        modeel.setRowCount(0);
+                        getFilesName();
+                        sleep(1000);
+                        
+                    }
+                }
+                catch(InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        clock.start();
+    }
+    
+    private void generatePDF()
+    {
+        
         String dt = LocalDate.now().toString();
-        String path = "";
+        
+        Calendar cal = new GregorianCalendar();
+        String sec = String.valueOf(cal.get(Calendar.SECOND));
+        String hr = String.valueOf(cal.get(Calendar.HOUR));
+        String min = String.valueOf(cal.get(Calendar.MINUTE));
+        /*String path = "";
         JFileChooser jf = new JFileChooser();
         jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int x = jf.showSaveDialog(this);
@@ -1086,14 +1308,23 @@ catch(NullPointerException e)
             path = jf.getSelectedFile().getPath();
         }
         
+        */
+        
         Document doc = new Document();
         try {
-            PdfWriter.getInstance(doc, new FileOutputStream(path + "/"+ dt +" INVENTORY REPORT.pdf"));
-            doc.open();
-            PdfPTable pdfTbl = new PdfPTable(5);
+            ArrayList<Integer> lowOnStock = new ArrayList<Integer>();
+            ArrayList<String> lowOnStockList = new ArrayList<String>();
+            ArrayList<Double> totAmtInStockAr = new ArrayList<Double>();
+            double totAmt;
+            PdfWriter.getInstance(doc, new FileOutputStream("C:\\Users\\Victorio\\Documents\\NetBeansProjects\\KrustyKrabInventorySystem\\src\\PDFs/" + hr + min + sec + " INVENTORY REPORT.pdf"));
             //com.lowagie.text.Rectangle pgSz = PageSize.A4.rotate();
             doc.setPageSize(PageSize.A4.rotate());
+            doc.open();
+            doc.add(new Paragraph("DAILY INVENTORY UPDATE REPORT FOR THE KRUSTY KRAB\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + dt + "\t\t\t\t\t\t\tPAGE:\t1\n\n")  );
+            doc.add(new Paragraph("\n\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"));
             
+            
+            PdfPTable pdfTbl = new PdfPTable(5);
             
             pdfTbl.addCell("Code");
             pdfTbl.addCell("Name");
@@ -1110,6 +1341,11 @@ catch(NullPointerException e)
                 String amountt = tblInventory.getValueAt(i,4).toString(); 
                 String quantity = tblInventory.getValueAt(i,5).toString(); 
                 
+                totAmtInStockAr.add(Double.parseDouble(amountt)*Double.parseDouble(quantity));
+                
+                if(Integer.parseInt(quantity) <=20)
+                {lowOnStock.add(Integer.parseInt(quantity)); lowOnStockList.add(namee);}
+                
                 pdfTbl.addCell(codee);
                 pdfTbl.addCell(namee);
                 pdfTbl.addCell(descrii);
@@ -1117,7 +1353,96 @@ catch(NullPointerException e)
                 pdfTbl.addCell(quantity);
             }
             
+
             doc.add(pdfTbl);
+            
+            
+            double sum = 0; 
+            for(int i = 0; i < totAmtInStockAr.size(); i++)
+            sum += totAmtInStockAr.get(i);
+            
+            doc.add(new Paragraph("SUMMARY:\n\tItem(s) low on stock\t: " + lowOnStock.size() + "\n\tList of Item(s) low on stock\t: " + lowOnStockList + "\n\tItem(s) high on stock\t: " + (tblInventory.getRowCount()-lowOnStock.size()) + "\n\tTotal no. of stock item(s)\t: " + tblInventory.getRowCount() + "\n\tTotal amount of all stock(s)\t: " + sum + "\tPHP"));
+            doc.add(new Paragraph("\n\n\n\n\n\n\n\n\n---------------------------------------------------------------------------END OF REPORT--------------------------------------------------------------------------------------------"));
+            
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DocumentException ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        doc.close();
+    }
+    
+    private void btnGeneratePdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGeneratePdfActionPerformed
+        String dt = LocalDate.now().toString();
+        String path = "";
+        JFileChooser jf = new JFileChooser();
+        jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int x = jf.showSaveDialog(this);
+        
+       
+        if(x == JFileChooser.APPROVE_OPTION)
+        {
+            path = jf.getSelectedFile().getPath();
+            System.out.println(path);
+        }
+        
+        
+        
+        Document doc = new Document();
+        try {
+            ArrayList<Integer> lowOnStock = new ArrayList<Integer>();
+            ArrayList<String> lowOnStockList = new ArrayList<String>();
+            ArrayList<Double> totAmtInStockAr = new ArrayList<Double>();
+            double totAmt;
+            PdfWriter.getInstance(doc, new FileOutputStream(path + "/"+ dt +" INVENTORY REPORT.pdf"));
+            //com.lowagie.text.Rectangle pgSz = PageSize.A4.rotate();
+            doc.setPageSize(PageSize.A4.rotate());
+            doc.open();
+            doc.add(new Paragraph("DAILY INVENTORY UPDATE REPORT FOR THE KRUSTY KRAB\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + dt + "\t\t\t\t\t\t\tPAGE:\t1\n\n")  );
+            doc.add(new Paragraph("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"));
+            
+            
+            PdfPTable pdfTbl = new PdfPTable(5);
+            
+            pdfTbl.addCell("Code");
+            pdfTbl.addCell("Name");
+            pdfTbl.addCell("Description");
+            pdfTbl.addCell("Amount");
+            pdfTbl.addCell("Quantity");
+            
+            
+            for(int i = 0; i < tblInventory.getRowCount(); i++)
+            {
+                String codee = tblInventory.getValueAt(i,1).toString(); 
+                String namee = tblInventory.getValueAt(i,2).toString(); 
+                String descrii = tblInventory.getValueAt(i,3).toString(); 
+                String amountt = tblInventory.getValueAt(i,4).toString(); 
+                String quantity = tblInventory.getValueAt(i,5).toString(); 
+                
+                totAmtInStockAr.add(Double.parseDouble(amountt)*Double.parseDouble(quantity));
+                
+                if(Integer.parseInt(quantity) <=20)
+                {lowOnStock.add(Integer.parseInt(quantity)); lowOnStockList.add(namee);}
+                
+                pdfTbl.addCell(codee);
+                pdfTbl.addCell(namee);
+                pdfTbl.addCell(descrii);
+                pdfTbl.addCell(amountt);
+                pdfTbl.addCell(quantity);
+            }
+            
+
+            doc.add(pdfTbl);
+            
+            
+            double sum = 0; 
+            for(int i = 0; i < totAmtInStockAr.size(); i++)
+            sum += totAmtInStockAr.get(i);
+            
+            doc.add(new Paragraph("SUMMARY:\n\tItem(s) low on stock\t: " + lowOnStock.size() + "\n\tList of Item(s) low on stock\t: " + lowOnStockList + "\n\tItem(s) high on stock\t: " + (tblInventory.getRowCount()-lowOnStock.size()) + "\n\tTotal no. of stock item(s)\t: " + tblInventory.getRowCount() + "\n\tTotal amount of all stock(s)\t: " + sum + "\tPHP"));
+            doc.add(new Paragraph("\n\n\n\n\n\n\n\n\n---------------------------------------------------------------------------END OF REPORT--------------------------------------------------------------------------------------------"));
+            
             
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
@@ -1130,7 +1455,7 @@ catch(NullPointerException e)
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public void main(String args[]) {
         
                 
 
@@ -1158,6 +1483,7 @@ catch(NullPointerException e)
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainForm().setVisible(true);
+                
                 
             }
         });
@@ -1189,8 +1515,11 @@ catch(NullPointerException e)
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblDateTime;
     private javax.swing.JLabel lblMenuLogo;
     private javax.swing.JLabel lblPictureHolder;
+    private javax.swing.JLabel lblTimeLang;
     private javax.swing.JPanel pnlBG;
     private javax.swing.JPanel pnlHome;
     private javax.swing.JPanel pnlInventoryEntryForm;
@@ -1199,6 +1528,7 @@ catch(NullPointerException e)
     private javax.swing.JPanel pnlMenu;
     private javax.swing.JPanel pnlReports;
     private javax.swing.JTable tblInventory;
+    public javax.swing.JTable tblReports;
     private javax.swing.JTextField txtAmount;
     private javax.swing.JTextField txtCode;
     private javax.swing.JTextArea txtDescription;
